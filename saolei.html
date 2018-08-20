@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>saolei</title>
+	<script type="text/javascript" src="C:\Users\yan\Desktop\test\jquery-1.12.4.js"></script>
+	<style type="text/css">
+		.mian{position: absolute;top: 100px;left: 200px;}
+		.main div{
+			border: 1px solid black;
+			background-color: #dddddd;
+			height: 28px;
+			width: 28px;
+			position: absolute;
+			float: left;
+		}
+		.a{
+			display: none;
+		}
+
+		.img{
+			display: none;height: 30px;width: 30px;
+		}
+		
+		.flag{
+			height: 30px;width: 30px;display: block;
+		}
+	</style>
+</head>
+<body>
+	<div class="main"></div>
+
+</body>
+<script type="text/javascript">
+	
+	var mineArray;
+	function init(x,y,mine){
+		mineArray=new Array(x);                     //创建二维数组
+		$.each(mineArray,function(key){
+			mineArray[key]=new Array(y)
+		})
+		for(i=0;i<x;i++){
+			for(j=0;j<y;j++){
+				mineArray[i][j]=0;
+			}
+		}
+		var bull="";
+		for(var i=0,row=mineArray.length;i<row;i++){
+			for(var j=0,cell=mineArray[0].length;j<cell;j++){
+				bull+='<div class="cell'+i+j+'" id="row" style="left:'+(200+i*30)+'px;top:'+(100+j*30)+'px;"><a class="a"></a></div>';
+				
+
+			}
+		}//添加格子
+
+		$(".main").html(bull).width(x*30).height(y*30).show()//畫圖
+		
+		//埋雷
+		var number=[]
+		while(mine>0){
+			var a=Math.floor(Math.random()*x)
+			var b=Math.floor(Math.random()*y)
+			number.push([a,b])
+			number.sort()
+			for(i=1;i<number.length;i++){
+				if(number[i].toString()==number[i-1].toString()){
+					number.splice(i,1)
+					mine+=1
+
+				}
+			}
+			if(mineArray[a][b]!=-1){
+				mineArray[a][b]=-1
+				$(".cell"+a+b+"").prepend('<img class="img" src="C://Users//yan//Desktop//lei.png">')
+			}
+
+			mine--
+		}
+		//遍麗數組，在炸弹周围的格子显示周围8个格子中的炸弹数量
+
+		for(i=0;i<x;i++){
+			for(j=0;j<y;j++){
+				if(mineArray[i][j]!=-1){
+					if(j>0&&mineArray[i][j-1]==-1){mineArray[i][j]++};//上邊
+					if(j+1<y&&mineArray[i][j+1]==-1){mineArray[i][j]++};//下邊
+					if(i>0&&mineArray[i-1][j]==-1){mineArray[i][j]++};//左邊
+					if(i+1<x&&mineArray[i+1][j]==-1){mineArray[i][j]++};//右邊
+					if(i>0&&j>0&&mineArray[i-1][j-1]==-1){mineArray[i][j]++};//左上
+					if(i+1<x&&j>0&&mineArray[i+1][j-1]==-1){mineArray[i][j]++};//右上
+					if(i>0&&j+1<y&&mineArray[i-1][j+1]==-1){mineArray[i][j]++};//左下
+					if(i+1<x&&j+1<y&&mineArray[i+1][j+1]==-1){mineArray[i][j]++};//右下
+					$(".cell"+i+j+"").children().first().text(mineArray[i][j])
+
+				}
+
+			}
+		}
+		
+		$(".main").children().mousedown(function (e){
+			var m=(parseInt($(this).css("left"))-200)/30;
+			var n=(parseInt($(this).css("top"))-100)/30;
+			if(e.button==2){
+				if($(".cell"+m+n+"").children().first().hasClass("flag")){
+					$(".cell"+m+n+"").children().first().remove()
+				}
+				else{
+					$(".cell"+m+n+"").prepend('<img class="flag" src="C://Users//yan//Desktop//flag.png">')
+					
+				}
+			}
+			if(e.button==0){
+				if($(".cell"+m+n+"").children().first().hasClass("flag")){
+					$(".cell"+m+n+"").unbind("click")
+				}
+				else{
+					$(".cell"+m+n+"").bind("click",function(){
+						if(mineArray[m][n]==-1){             //点到格子里有炸弹后，所有炸弹都显示出来，游戏停止
+							//console.log(m,n)
+							$(".cell"+m+n+"").append('<img class="img" src="C://Users//yan//Desktop//lei2.png">')
+							$("img").css("display","block")
+							$(".cell"+m+n+"").children().first().remove()
+							$(".main").children().unbind("click")  
+							$(".main").children().unbind("mousedown")              
+						}
+						if(mineArray[m][n]>0){               //点击格子里数字大于0后，显示数字
+							$(this).children().first().css("display","block")
+						}
+						if(mineArray[m][n]==0){				//点击格子里数字为0，显示周围所有的数字		
+							openbox(m,n)
+							
+
+						}
+
+					})
+				}
+			}
+
+		})
+
+		function openbox(m,n){
+			//$(".main").children().eq(m*10+n).children().first().css("display","block")
+			//$(".main").children().eq(m*10+n).css("background-color","white")
+			$(".cell"+m+n+"").css("background-color","white");
+			//上邊
+			if(m<x&&n>0&&mineArray[m][n-1]>0){  
+
+				$(".cell"+m+(n-1)+"").children().first().css("display","block")
+				
+				
+			}
+			if(m<x&&n>0&&mineArray[m][n-1]==0){
+				//console.log($(".cell"+m+(n-1)+"").css("background-color"))
+				//console.log($(".cell"+m+(n-1)+"").css("background-color")!="rgb(255, 255, 255)")
+				if($(".cell"+m+(n-1)+"").css("background-color")!="rgb(255,255,255)"){
+				openbox(m,n-1)}
+			
+			}
+			//下邊
+			if(m<x&&n+1<y&&mineArray[m][n+1]>0){  
+				
+				$(".cell"+m+(n+1)+"").children().first().css("display","block")
+				
+			}
+			if(m<x&&n+1<y&&mineArray[m][n+1]==0){
+				if($(".cell"+m+(n+1)+"").css("background-color")!="rgb(255, 255, 255)"){
+				openbox(m,n+1)}
+				
+			}
+			//左邊
+			
+			if(m>0&&n<y&&mineArray[m-1][n]>0){  
+				
+				$(".cell"+(m-1)+n+"").children().first().css("display","block")
+			
+			}
+			if(m>0&&n<y&&mineArray[m-1][n]==0){
+				if($(".cell"+(m-1)+n+"").css("background-color")!="rgb(255, 255, 255)"){
+				openbox(m-1,n)}
+			}
+			//右邊
+			if(m+1<x&&n<y&&mineArray[m+1][n]>0){  
+					
+				$(".cell"+(m+1)+n+"").children().first().css("display","block")
+				
+			}
+			if(m+1<x&&n<y&&mineArray[m+1][n]==0){
+				if($(".cell"+(m+1)+n+"").css("background-color")!="rgb(255, 255, 255)"){
+				openbox(m+1,n)}
+			}
+			//左上
+			if(m>0&&n>0&&mineArray[m-1][n-1]>0){  
+					
+				$(".cell"+(m-1)+(n-1)+"").children().first().css("display","block")
+				
+			}
+			if(m>0&&n>0&&mineArray[m-1][n-1]==0){
+				if($(".cell"+(m-1)+(n-1)+"").css("background-color")!="rgb(255, 255, 255)"){
+				openbox(m-1,n-1)}
+			}
+			//右上
+			if(m+1<x&&n>0&&mineArray[m+1][n-1]>0){  
+					
+				$(".cell"+(m+1)+(n-1)+"").children().first().css("display","block")
+				
+			}
+			if(m+1<x&&n>0&&mineArray[m+1][n-1]==0){
+				if($(".cell"+(m+1)+(n-1)+"").css("background-color")!="rgb(255, 255, 255)"){
+				openbox(m+1,n-1)}
+			}
+			//左下
+			if(m>0&&n+1<y&&mineArray[m-1][n+1]>0){  
+					
+				$(".cell"+(m-1)+(n+1)+"").children().first().css("display","block")
+
+			}
+			if(m>0&&n+1<y&&mineArray[m-1][n+1]==0){
+				if($(".cell"+(m-1)+(n+1)+"").css("background-color")!="rgb(255, 255, 255)"){
+				openbox(m-1,n+1)}
+			}
+			//右下
+			if(m+1<x&&n+1<y&&mineArray[m+1][n+1]>0){  
+					
+				$(".cell"+(m+1)+(n+1)+"").children().first().css("display","block")
+	
+			}
+			if(m+1<x&&n+1<y&&mineArray[m+1][n+1]==0){
+				if($(".cell"+(m+1)+(n+1)+"").css("background-color")!="rgb(255, 255, 255)"){
+				openbox(m+1,n+1)}
+			}
+			
+		}
+
+		document.oncontextmenu=function(e){
+			e.preventDefault()
+		}
+
+		
+			
+	}
+	
+	init(15,15,15)
+
+	
+
+
+</script>
+</html>

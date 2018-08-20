@@ -1,0 +1,8 @@
+body{
+	background-color: #ddd;
+
+}
+
+#app{
+	width: 600px;height: 100%;background-color: #fff;position: absolute;top: 0px;left: 300px;
+}

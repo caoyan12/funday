@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>别踩白块</title>
+    <script src="C:\Users\yan\Desktop\test\jquery-1.12.4.js"></script>
+    <style>
+        .content{
+            height: 400px; width: 400px; margin-left: 300px; border: 1px solid black;position: relative;overflow: hidden;    
+        }
+        
+        .hide{
+            height: 400px;width: 400px;margin-top: -100px;top: 0px;
+        }
+        .row{
+            height: 100px;width: 400px;
+        }
+        .cell{
+            height: 98px;width: 98px;float: left;border:1px solid black;
+            
+        }
+        .black{
+            background-color: black;
+          
+        }
+        .title{
+            width: 100%;height: 150px;
+        }
+        .con{
+            height: 400px;width: 100%;
+        }
+        .bottom{
+            height: 100px;width: 100%;position: absolute;top: 600px;
+        }
+        #start{
+            margin-left: 370px;height: 50px;width: 80px;
+        }
+
+        #stop{
+            margin-left: 100px;height: 50px;width: 80px;
+        }
+
+        .score{
+            margin-left: 470px; line-height: 150px;font-weight: bold;
+        }
+
+        .score_number{
+             line-height: 150px;font-weight: bold;color: red;
+        }
+
+        
+    </style>
+</head>
+<body>
+<div class="title">
+    <a class="score">你的分数</a>
+    <a class="score_number">0</a>
+</div>
+<div class="con">
+    <div class="content">
+        <div class="hide">
+
+        </div>
+    </div>
+</div>
+<div class="bottom">
+    <button id="start">开始</button>
+    <button id="stop">暂停</button>
+</div>
+<script>
+    var speed=4
+    //初始化
+    function init () {
+        $.each([0,1,2,3],function () {
+            createrow()
+        })
+        
+    }
+    //创建新的一行
+    function createrow(){
+
+        $(".hide").prepend("<div class='row'></div>")
+        var i=Math.floor(Math.random()*4)
+        for(k=0;k<4;k++){
+            if (k==i){
+                $(".row").first().append('<div class="cell black"></div>')
+            }
+            else{
+                $(".row").first().append('<div class="cell "></div>')
+            }
+
+        }
+        
+
+        
+
+
+    }
+    init()
+    //格子下移
+    function move() {
+        var top1=parseInt($(".hide").offset().top)
+        top1+=speed
+        $(".hide").offset({top:top1})
+        
+        if(top1>=159){
+            if($(".row:last").children().hasClass("black")){
+                gameover()
+            }
+            else{ 
+            $(".row:last").remove();
+            createrow()
+            $(".hide").offset({top:59})
+            
+             }
+        
+        }    
+
+    }
+function score(){
+    var score1=parseInt($(".score_number").text())
+    $(".score_number").text(score1+1)
+    if(score1%10==0){
+        speed+=2
+        console.log(speed)
+    }
+}
+$("#start").click(function(){
+    
+    window.timer=setInterval("move()",100)
+    $(".hide").click(function(e){
+        var current=$(e.target)
+            if(current.hasClass("black")){
+                current.removeClass("black")
+                score()
+            }
+                else{
+                gameover()
+            }
+ 
+    })
+
+   
+})
+
+$("#stop").click(function(){
+
+    clearInterval(window.timer)
+})
+
+function gameover(){
+    $("#stop").trigger("click")
+    var score1=parseInt($(".score_number").text())
+    alert("score:"+score1)
+
+}
+
+</script>
+
+</body>
+</html>

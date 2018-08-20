@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>11</title>
+	<script  src="C:\Users\yan\Desktop\website\src\assets\js\jquery-1.12.4.js"></script>
+
+</head>
+<body>
+	<script type="text/javascript">
+	$.ajax({
+		ul:"http://localhost:8080/C:/Users/yan/Desktop/follow.data",
+		dataType:"jsonp",
+		jsonp:"jsonpCallback",
+		type:"get",
+		success:function(){
+			alert(1)
+		}
+	})
+	</script>
+
+
+</body>
+</html>
